@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>4.0.7</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.wd</groupId>
+	<artifactId>ms-reporting-analytics-service</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>ms-reporting-analytics-service</name>
+	<description>World Dance - Microservicio de Reportes y Estadisticas</description>
+
+	<properties>
+		<java.version>21</java.version>
+		<!-- Mismo par Boot+Cloud que ya validaste y dejaste funcionando
+		     end-to-end en wd-api-gateway (9 issues resueltos ahi) -->
+		<spring-cloud.version>2025.1.2</spring-cloud.version>
+	</properties>
+
+	<dependencies>
+		<!-- Web (REST controllers, RestClient para llamar al MCP) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- MongoDB (event_summaries, activity_logs) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+		</dependency>
+
+		<!-- Spring Cloud: descubrimiento por Consul -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-consul-discovery</artifactId>
+		</dependency>
+
+		<!-- OpenFeign: para consumir ms-scoring-evaluation y ms-event -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+
+		<!-- Actuator: health checks, igual que en tus otros microservicios -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- Validation: para validar DTOs de entrada (ej. request de generar reporte) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- Un unico starter de test cubre JUnit, Mockito y MockMvc -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+						<configuration>
+							<annotationProcessorPaths>
+								<path>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok</artifactId>
+								</path>
+							</annotationProcessorPaths>
+						</configuration>
+					</execution>
+					<execution>
+						<id>default-testCompile</id>
+						<phase>test-compile</phase>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+						<configuration>
+							<annotationProcessorPaths>
+								<path>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok</artifactId>
+								</path>
+							</annotationProcessorPaths>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
