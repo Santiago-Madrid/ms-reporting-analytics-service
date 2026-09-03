@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="report.css" type="text/css"/>
+</head>
+<body>
+    <div class="brand-banner">
+        <h1 th:text="${eventName}"></h1>
+        <p class="subtitle" th:text="'Informe generado - Fecha de ejecucion: ' + ${executionDate}"></p>
+    </div>
+    <div class="brand-banner-accent"></div>
+
+    <h2>Resumen general</h2>
+    <p class="narrative" th:text="${introduccion}"></p>
+
+    <table class="metric-cards">
+        <tr>
+            <td>
+                <span class="metric-value" th:text="${totalParticipants}"></span>
+                <span class="metric-label">Participantes</span>
+            </td>
+            <td>
+                <span class="metric-value" th:text="${totalModalities}"></span>
+                <span class="metric-label">Modalidades</span>
+            </td>
+            <td>
+                <span class="metric-value" th:text="${overallAverageScore}"></span>
+                <span class="metric-label">Promedio general</span>
+            </td>
+            <td>
+                <span class="metric-value" th:text="${highestScore}"></span>
+                <span class="metric-label">Puntaje mas alto</span>
+            </td>
+            <td>
+                <span class="metric-value" th:text="${lowestScore}"></span>
+                <span class="metric-label">Puntaje mas bajo</span>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Analisis por modalidad</h2>
+    <p class="narrative" th:text="${analisisPorModalidad}"></p>
+
+    <table>
+        <tr>
+            <th>Categoria</th>
+            <th>Division</th>
+            <th>Participantes</th>
+            <th>Promedio</th>
+        </tr>
+        <tr th:each="modalidad : ${modalities}">
+            <td th:text="${modalidad.category}"></td>
+            <td th:text="${modalidad.division}"></td>
+            <td th:text="${modalidad.participantCount}"></td>
+            <td th:text="${modalidad.averageScore}"></td>
+        </tr>
+    </table>
+
+    <h2>Conclusion</h2>
+    <p class="narrative" th:text="${conclusion}"></p>
+</body>
+</html>
+
