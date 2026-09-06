@@ -41,6 +41,8 @@ public class EventSummary {
 
     private EvaluationMetrics evaluationMetrics = new EvaluationMetrics();
 
+    private ScheduleMetrics scheduleMetrics = new ScheduleMetrics();
+
     private SystemMetrics systemMetrics = new SystemMetrics();
 
     private Instant generatedAt;
@@ -73,6 +75,14 @@ public class EventSummary {
         private Double highestScore = 0.0;
         private Double lowestScore = 0.0;
         private Double overallAverage = 0.0;
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class ScheduleMetrics {
+        private Integer totalSlots = 0;
+        private String scheduleStatus = "NOT_CONFIGURED";
+        private String generatedAt;
     }
 
     @Data

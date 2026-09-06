@@ -25,6 +25,10 @@
                 <span class="metric-label">Modalidades</span>
             </td>
             <td>
+                <span class="metric-value" th:text="${totalScheduledSlots}"></span>
+                <span class="metric-label">Turnos Cronograma</span>
+            </td>
+            <td>
                 <span class="metric-value" th:text="${overallAverageScore}"></span>
                 <span class="metric-label">Promedio general</span>
             </td>
@@ -56,6 +60,9 @@
             <td th:text="${modalidad.averageScore}"></td>
         </tr>
     </table>
+
+    <h2>Estado de Programacion y Cronograma</h2>
+    <p class="narrative" th:text="'Estado del Cronograma: ' + ${scheduleStatus} + ' | Total de slots programados: ' + ${totalScheduledSlots}"></p>
 
     <h2>Conclusion</h2>
     <p class="narrative" th:text="${conclusion}"></p>

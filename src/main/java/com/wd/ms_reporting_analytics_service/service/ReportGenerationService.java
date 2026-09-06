@@ -56,9 +56,22 @@ public class ReportGenerationService {
         context.setVariable("executionDate", summary.getExecutionDate());
         context.setVariable("totalParticipants", summary.getTotals().getApprovedEnrollments());
         context.setVariable("totalModalities", summary.getTotals().getTotalModalities());
-        context.setVariable("overallAverageScore", summary.getEvaluationMetrics().getOverallAverage());
-        context.setVariable("highestScore", summary.getEvaluationMetrics().getHighestScore());
-        context.setVariable("lowestScore", summary.getEvaluationMetrics().getLowestScore());
+        context.setVariable("overallAverageScore", String.format("%.2f", summary.getEvaluationMetrics().getOverallAverage()));
+        context.setVariable("highestScore", String.format("%.2f", summary.getEvaluationMetrics().getHighestScore()));
+        context.setVariable("lowestScore", String.format("%.2f", summary.getEvaluationMetrics().getLowestScore()));
+        
+        // Cronograma metrics
+        context.setVariable("totalScheduledSlots", summary.getScheduleMetrics() != null ? summary.getScheduleMetrics().getTotalSlots() : 0);
+        context.setVariable("scheduleStatus", summary.getScheduleMetrics() != null ? summary.getScheduleMetrics().getScheduleStatus() : "N/A");
+
+        // Format modality average scores
+        if (summary.getModalitiesBreakdown() != null) {
+            summary.getModalitiesBreakdown().forEach(m -> {
+                if (m.getAverageScore() != null) {
+                    m.setAverageScore(Math.round(m.getAverageScore() * 100.0) / 100.0);
+                }
+            });
+        }
         context.setVariable("modalities", summary.getModalitiesBreakdown());
         context.setVariable("introduccion", narrative.getIntroduccion());
         context.setVariable("analisisPorModalidad", narrative.getAnalisisPorModalidad());

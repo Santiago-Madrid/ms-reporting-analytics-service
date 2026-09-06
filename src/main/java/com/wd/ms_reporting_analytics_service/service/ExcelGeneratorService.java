@@ -56,6 +56,8 @@ public class ExcelGeneratorService {
                 {"Evento", summary.getEventName()},
                 {"Total participantes", summary.getTotals().getApprovedEnrollments()},
                 {"Total modalidades", summary.getTotals().getTotalModalities()},
+                {"Turnos programados", summary.getScheduleMetrics() != null ? summary.getScheduleMetrics().getTotalSlots() : 0},
+                {"Estado del cronograma", summary.getScheduleMetrics() != null ? summary.getScheduleMetrics().getScheduleStatus() : "N/A"},
                 {"Promedio general", summary.getEvaluationMetrics().getOverallAverage()},
                 {"Puntaje mas alto", summary.getEvaluationMetrics().getHighestScore()},
                 {"Puntaje mas bajo", summary.getEvaluationMetrics().getLowestScore()}
