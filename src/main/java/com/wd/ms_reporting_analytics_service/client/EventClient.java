@@ -18,7 +18,7 @@ import com.wd.ms_reporting_analytics_service.dto.external.HttpGlobalResponse;
  * path = "/api/v1/events" -> context-path (/api/v1) + @RequestMapping
  * base del EventController (/events).
  */
-@FeignClient(name = "ms-event-category", path = "/api/v1/events")
+@FeignClient(name = "ms-event-category", contextId = "eventClient", path = "/api/v1/events")
 public interface EventClient {
 
     @GetMapping("/{eventId}")
