@@ -41,8 +41,11 @@ public class EventSummary {
 
     private EvaluationMetrics evaluationMetrics = new EvaluationMetrics();
 
+<<<<<<< HEAD
+=======
     private ScheduleMetrics scheduleMetrics = new ScheduleMetrics();
 
+>>>>>>> develop
     private SystemMetrics systemMetrics = new SystemMetrics();
 
     private Instant generatedAt;
@@ -79,6 +82,8 @@ public class EventSummary {
 
     @Data
     @NoArgsConstructor
+<<<<<<< HEAD
+=======
     public static class ScheduleMetrics {
         private Integer totalSlots = 0;
         private String scheduleStatus = "NOT_CONFIGURED";
@@ -87,6 +92,7 @@ public class EventSummary {
 
     @Data
     @NoArgsConstructor
+>>>>>>> develop
     public static class SystemMetrics {
         private Integer peakLiveViewers = 0;
         private Integer totalStreamReactions = 0;

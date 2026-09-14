@@ -7,6 +7,20 @@ import org.springframework.web.client.RestClient;
 import com.wd.ms_reporting_analytics_service.dto.AiReportRequest;
 import com.wd.ms_reporting_analytics_service.dto.AiReportResponse;
 
+<<<<<<< HEAD
+/**
+ * Cliente hacia el MCP de Python. A diferencia de EventCategoryClient/
+ * ScoringClient (que son @FeignClient porque esos servicios estan
+ * registrados en Consul), este usa RestClient plano apuntando a una
+ * URL configurada directamente en application.yml (ai.mcp.report-endpoint),
+ * porque el MCP no es un microservicio Spring del ecosistema World Dance.
+ *
+ * OJO: la URL en application.yml es un placeholder
+ * (http://localhost:8000/generate-report-narrative) hasta que el
+ * endpoint real del MCP este listo - ajustar ahi, no aqui.
+ */
+@Component
+=======
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -14,11 +28,25 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Component
 @Slf4j
+>>>>>>> develop
 public class McpReportClient {
 
     private final RestClient restClient;
     private final String reportEndpoint;
 
+<<<<<<< HEAD
+    public McpReportClient(@Value("${ai.mcp.report-endpoint}") String reportEndpoint) {
+        this.reportEndpoint = reportEndpoint;
+        this.restClient = RestClient.create();
+    }
+
+    public AiReportResponse generateNarrative(AiReportRequest request) {
+        return restClient.post()
+                .uri(reportEndpoint)
+                .body(request)
+                .retrieve()
+                .body(AiReportResponse.class);
+=======
     public McpReportClient(@Value("${ai.mcp.report-endpoint:http://localhost:8000/generate-report-narrative}") String reportEndpoint) {
         this.reportEndpoint = reportEndpoint;
         this.restClient = RestClient.builder().build();
@@ -62,5 +90,6 @@ public class McpReportClient {
         );
 
         return fallback;
+>>>>>>> develop
     }
 }

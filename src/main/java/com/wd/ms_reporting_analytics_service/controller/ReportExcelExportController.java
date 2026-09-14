@@ -21,7 +21,7 @@ public class ReportExcelExportController {
     private final ReportGenerationService reportGenerationService;
     private final ExcelGeneratorService excelGeneratorService;
 
-    @GetMapping
+    @GetMapping(produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     public ResponseEntity<byte[]> exportExcel(@PathVariable Long eventId) {
         ReportGenerationService.ReportData data = reportGenerationService.buildReportData(eventId);
         byte[] excelBytes = excelGeneratorService.generateExcel(data.summary(), data.narrative());

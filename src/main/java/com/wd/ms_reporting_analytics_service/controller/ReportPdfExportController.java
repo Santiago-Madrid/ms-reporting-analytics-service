@@ -23,7 +23,7 @@ public class ReportPdfExportController {
     private final ReportGenerationService reportGenerationService;
     private final PdfGeneratorService pdfGeneratorService;
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> exportPdf(@PathVariable Long eventId) {
         ReportGenerationService.ReportData data = reportGenerationService.buildReportData(eventId);
         Context context = reportGenerationService.toTemplateContext(data);
