@@ -41,7 +41,15 @@ public class ReportGenerationService {
                 .orElseGet(() -> consolidationService.syncEventSummary(eventId));
 
         AiReportRequest aiRequest = toAiRequest(summary);
-        AiReportResponse narrative = mcpReportClient.generateNarrative(aiRequest);
+        AiReportResponse narrative = new AiReportResponse();
+        try {
+            narrative = mcpReportClient.generateNarrative(aiRequest);
+        } catch (Exception e) {
+            // Fallback si el microservicio de python MCP no esta corriendo
+            narrative.setIntroduccion("");
+            narrative.setAnalisisPorModalidad("");
+            narrative.setConclusion("");
+        }
 
         return new ReportData(summary, narrative);
     }
