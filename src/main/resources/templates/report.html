@@ -2,7 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-<<<<<<< HEAD
     <style>
         @page {
             size: A4;
@@ -126,7 +125,7 @@
 <body>
     <div class="header">
         <h1 th:text="${eventName}">Nombre del Evento</h1>
-        <p class="date" th:text="'Informe analítico generado el ' + ${#dates.format(executionDate, 'dd/MM/yyyy')}"></p>
+        <p class="date" th:text="'Informe analítico generado el ' + ${executionDate}"></p>
     </div>
 
     <h2>Resumen General</h2>
@@ -144,15 +143,15 @@
                 <span class="metric-label">Modalidades</span>
             </td>
             <td>
-                <span class="metric-value" th:text="${#numbers.formatDecimal(overallAverageScore, 1, 2)}">0.00</span>
+                <span class="metric-value" th:text="${overallAverageScore}">0.00</span>
                 <span class="metric-label">Promedio General</span>
             </td>
             <td>
-                <span class="metric-value" th:text="${#numbers.formatDecimal(highestScore, 1, 2)}">0.00</span>
+                <span class="metric-value" th:text="${highestScore}">0.00</span>
                 <span class="metric-label">Puntaje Máximo</span>
             </td>
             <td>
-                <span class="metric-value" th:text="${#numbers.formatDecimal(lowestScore, 1, 2)}">0.00</span>
+                <span class="metric-value" th:text="${lowestScore}">0.00</span>
                 <span class="metric-label">Puntaje Mínimo</span>
             </td>
             <td>
@@ -176,7 +175,7 @@
             <td th:text="${modalidad.category}"></td>
             <td th:text="${modalidad.division}"></td>
             <td th:text="${modalidad.participantCount}"></td>
-            <td th:text="${#numbers.formatDecimal(modalidad.averageScore, 1, 2)}"></td>
+            <td th:text="${modalidad.averageScore}"></td>
         </tr>
         <tr th:if="${modalities == null or modalities.isEmpty()}">
             <td colspan="4" class="empty-text" style="text-align: center;">No hay modalidades registradas para este evento.</td>
