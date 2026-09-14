@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: ms-reports
+
+  data:
+    mongodb:
+      url: ${MONGODB_URI:mongodb://localhost:27017/world_dance_reports}
+      auto-index-creation: true
+
+  cloud:
+    consul:
+      host: ${URL_CONSUL:localhost}
+      port: ${PORT_CONSUL:8500}
+      discovery:
+        health-check-path: /api/v1/actuator/health
+        health-check-interval: 10s
+        instance-id: ${spring.application.name}:${random.value}
+        prefer-ip-address: true
+
+server:
+  port: 9096
+  servlet:
+    context-path: /api/v1
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+  endpoint:
+    health:
+      show-details: always
+
+# URL del microservicio Python con el MCP de IA (ajusta cuando lo tengas listo)
+ai:
+  mcp:
+    report-endpoint: ${MCP_REPORT_URL:http://localhost:8000/generate-report-narrative}
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:F0bVQgRnuk6DRxooVWKaG0ndlgqEeI/4YXObXeOaR2Q=}

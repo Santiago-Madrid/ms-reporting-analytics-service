@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <style>
+        @page {
+            size: A4;
+            margin: 2.5cm;
+            @bottom-center {
+                content: "World Dance  -  Página " counter(page) " de " counter(pages);
+                font-size: 10px;
+                color: #7b7b7b;
+            }
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #333333;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #7c3aed;
+            padding-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #1a1b26;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header .date {
+            font-size: 12px;
+            color: #666666;
+            margin: 0;
+        }
+
+        h2 {
+            color: #2e3545;
+            font-size: 18px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 4px solid #7c3aed;
+        }
+
+        .metrics-container {
+            width: 100%;
+            margin-bottom: 30px;
+            border-collapse: separate;
+            border-spacing: 10px 0;
+        }
+
+        .metrics-container td {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 15px 5px;
+            text-align: center;
+            width: 20%;
+        }
+
+        .metric-value {
+            display: block;
+            font-size: 22px;
+            font-weight: bold;
+            color: #7c3aed;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            display: block;
+            font-size: 10px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 30px;
+        }
+
+        table.data-table th, table.data-table td {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        table.data-table th {
+            background-color: #f8fafc;
+            color: #334155;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        table.data-table tr:nth-child(even) {
+            background-color: #fcfdfd;
+        }
+
+        .narrative {
+            text-align: justify;
+            margin-bottom: 20px;
+            color: #475569;
+        }
+        
+        /* Ocultar secciones de narrativa si no hay contenido (evita titulos colgados) */
+        .empty-text {
+            color: #a0aec0;
+            font-style: italic;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 th:text="${eventName}">Nombre del Evento</h1>
+        <p class="date" th:text="'Informe analítico generado el ' + ${#dates.format(executionDate, 'dd/MM/yyyy')}"></p>
+    </div>
+
+    <h2>Resumen General</h2>
+    <p class="narrative" th:if="${introduccion != null and !introduccion.isEmpty()}" th:text="${introduccion}"></p>
+    <p class="empty-text" th:unless="${introduccion != null and !introduccion.isEmpty()}">El análisis narrativo de introducción no está disponible actualmente.</p>
+
+    <table class="metrics-container">
+        <tr>
+            <td>
+                <span class="metric-value" th:text="${totalParticipants}">0</span>
+                <span class="metric-label">Participantes</span>
+            </td>
+            <td>
+                <span class="metric-value" th:text="${totalModalities}">0</span>
+                <span class="metric-label">Modalidades</span>
+            </td>
+            <td>
+                <span class="metric-value" th:text="${#numbers.formatDecimal(overallAverageScore, 1, 2)}">0.00</span>
+                <span class="metric-label">Promedio General</span>
+            </td>
+            <td>
+                <span class="metric-value" th:text="${#numbers.formatDecimal(highestScore, 1, 2)}">0.00</span>
+                <span class="metric-label">Puntaje Máximo</span>
+            </td>
+            <td>
+                <span class="metric-value" th:text="${#numbers.formatDecimal(lowestScore, 1, 2)}">0.00</span>
+                <span class="metric-label">Puntaje Mínimo</span>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Análisis por Modalidad</h2>
+    <p class="narrative" th:if="${analisisPorModalidad != null and !analisisPorModalidad.isEmpty()}" th:text="${analisisPorModalidad}"></p>
+
+    <table class="data-table">
+        <tr>
+            <th>Categoría</th>
+            <th>División</th>
+            <th>Participantes</th>
+            <th>Promedio</th>
+        </tr>
+        <tr th:each="modalidad : ${modalities}">
+            <td th:text="${modalidad.category}"></td>
+            <td th:text="${modalidad.division}"></td>
+            <td th:text="${modalidad.participantCount}"></td>
+            <td th:text="${#numbers.formatDecimal(modalidad.averageScore, 1, 2)}"></td>
+        </tr>
+        <tr th:if="${modalities == null or modalities.isEmpty()}">
+            <td colspan="4" class="empty-text" style="text-align: center;">No hay modalidades registradas para este evento.</td>
+        </tr>
+    </table>
+
+    <h2>Conclusión</h2>
+    <p class="narrative" th:if="${conclusion != null and !conclusion.isEmpty()}" th:text="${conclusion}"></p>
+    <p class="empty-text" th:unless="${conclusion != null and !conclusion.isEmpty()}">El análisis narrativo de conclusión no está disponible actualmente.</p>
+
+</body>
+</html>
+
