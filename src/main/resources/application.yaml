@@ -1,14 +1,25 @@
 spring:
   application:
+<<<<<<< HEAD
     name: ms-reports
 
   data:
     mongodb:
       url: ${MONGODB_URI:mongodb://localhost:27017/world_dance_reports}
+=======
+    name: ${SPRING_APPLICATION_NAME:ms-reporting-analytics-service}
+
+  mongodb:
+    uri: ${SPRING_MONGODB_URI:mongodb://${MONGO_HOST:worlddance-mongodb}:${MONGO_PORT:27017}/${MONGO_DB:world_dance_reports}}
+
+  data:
+    mongodb:
+>>>>>>> develop
       auto-index-creation: true
 
   cloud:
     consul:
+<<<<<<< HEAD
       host: ${URL_CONSUL:localhost}
       port: ${PORT_CONSUL:8500}
       discovery:
@@ -21,6 +32,21 @@ server:
   port: 9096
   servlet:
     context-path: /api/v1
+=======
+      host: ${SPRING_CLOUD_CONSUL_HOST:worlddance-consul}
+      port: ${SPRING_CLOUD_CONSUL_PORT:8500}
+      discovery:
+        service-name: ${SPRING_CLOUD_CONSUL_DISCOVERY_SERVICE_NAME:ms-reporting-analytics-service}
+        hostname: ${SPRING_CLOUD_CONSUL_DISCOVERY_HOSTNAME:ms-reporting-analytics-service}
+        prefer-ip-address: false
+        health-check-path: /api/v1/actuator/health
+        health-check-interval: 10s
+
+server:
+  port: ${SERVER_PORT:9098}
+  servlet:
+    context-path: ${SERVER_SERVLET_CONTEXT_PATH:/api/v1}
+>>>>>>> develop
 
 management:
   endpoints:
@@ -32,11 +58,21 @@ management:
   endpoint:
     health:
       show-details: always
+<<<<<<< HEAD
 
 # URL del microservicio Python con el MCP de IA (ajusta cuando lo tengas listo)
 ai:
   mcp:
     report-endpoint: ${MCP_REPORT_URL:http://localhost:8000/generate-report-narrative}
+=======
+  health:
+    mongo:
+      enabled: false
+
+ai:
+  mcp:
+    report-endpoint: ${MCP_REPORT_URL:http://mcp-scheduling-reporting:5000/generate-report-narrative}
+>>>>>>> develop
 
 security:
   jwt:
