@@ -56,11 +56,6 @@ public class ReportGenerationService {
         context.setVariable("executionDate", summary.getExecutionDate());
         context.setVariable("totalParticipants", summary.getTotals().getApprovedEnrollments());
         context.setVariable("totalModalities", summary.getTotals().getTotalModalities());
-<<<<<<< HEAD
-        context.setVariable("overallAverageScore", summary.getEvaluationMetrics().getOverallAverage());
-        context.setVariable("highestScore", summary.getEvaluationMetrics().getHighestScore());
-        context.setVariable("lowestScore", summary.getEvaluationMetrics().getLowestScore());
-=======
         context.setVariable("overallAverageScore", String.format("%.2f", summary.getEvaluationMetrics().getOverallAverage()));
         context.setVariable("highestScore", String.format("%.2f", summary.getEvaluationMetrics().getHighestScore()));
         context.setVariable("lowestScore", String.format("%.2f", summary.getEvaluationMetrics().getLowestScore()));
@@ -77,7 +72,6 @@ public class ReportGenerationService {
                 }
             });
         }
->>>>>>> develop
         context.setVariable("modalities", summary.getModalitiesBreakdown());
         context.setVariable("introduccion", narrative.getIntroduccion());
         context.setVariable("analisisPorModalidad", narrative.getAnalisisPorModalidad());

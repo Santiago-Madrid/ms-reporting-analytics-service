@@ -154,50 +154,14 @@
             <td>
                 <span class="metric-value" th:text="${#numbers.formatDecimal(lowestScore, 1, 2)}">0.00</span>
                 <span class="metric-label">Puntaje Mínimo</span>
-=======
-    <link rel="stylesheet" href="report.css" type="text/css"/>
-</head>
-<body>
-    <div class="brand-banner">
-        <h1 th:text="${eventName}"></h1>
-        <p class="subtitle" th:text="'Informe generado - Fecha de ejecucion: ' + ${executionDate}"></p>
-    </div>
-    <div class="brand-banner-accent"></div>
-
-    <h2>Resumen general</h2>
-    <p class="narrative" th:text="${introduccion}"></p>
-
-    <table class="metric-cards">
-        <tr>
-            <td>
-                <span class="metric-value" th:text="${totalParticipants}"></span>
-                <span class="metric-label">Participantes</span>
             </td>
             <td>
-                <span class="metric-value" th:text="${totalModalities}"></span>
-                <span class="metric-label">Modalidades</span>
-            </td>
-            <td>
-                <span class="metric-value" th:text="${totalScheduledSlots}"></span>
+                <span class="metric-value" th:text="${totalScheduledSlots}">0</span>
                 <span class="metric-label">Turnos Cronograma</span>
-            </td>
-            <td>
-                <span class="metric-value" th:text="${overallAverageScore}"></span>
-                <span class="metric-label">Promedio general</span>
-            </td>
-            <td>
-                <span class="metric-value" th:text="${highestScore}"></span>
-                <span class="metric-label">Puntaje mas alto</span>
-            </td>
-            <td>
-                <span class="metric-value" th:text="${lowestScore}"></span>
-                <span class="metric-label">Puntaje mas bajo</span>
->>>>>>> develop
             </td>
         </tr>
     </table>
 
-<<<<<<< HEAD
     <h2>Análisis por Modalidad</h2>
     <p class="narrative" th:if="${analisisPorModalidad != null and !analisisPorModalidad.isEmpty()}" th:text="${analisisPorModalidad}"></p>
 
@@ -205,15 +169,6 @@
         <tr>
             <th>Categoría</th>
             <th>División</th>
-=======
-    <h2>Analisis por modalidad</h2>
-    <p class="narrative" th:text="${analisisPorModalidad}"></p>
-
-    <table>
-        <tr>
-            <th>Categoria</th>
-            <th>Division</th>
->>>>>>> develop
             <th>Participantes</th>
             <th>Promedio</th>
         </tr>
@@ -221,7 +176,6 @@
             <td th:text="${modalidad.category}"></td>
             <td th:text="${modalidad.division}"></td>
             <td th:text="${modalidad.participantCount}"></td>
-<<<<<<< HEAD
             <td th:text="${#numbers.formatDecimal(modalidad.averageScore, 1, 2)}"></td>
         </tr>
         <tr th:if="${modalities == null or modalities.isEmpty()}">
@@ -229,21 +183,12 @@
         </tr>
     </table>
 
+    <h2>Estado de Programación y Cronograma</h2>
+    <p class="narrative" th:text="'Estado del Cronograma: ' + ${scheduleStatus} + ' | Total de slots programados: ' + ${totalScheduledSlots}"></p>
+
     <h2>Conclusión</h2>
     <p class="narrative" th:if="${conclusion != null and !conclusion.isEmpty()}" th:text="${conclusion}"></p>
     <p class="empty-text" th:unless="${conclusion != null and !conclusion.isEmpty()}">El análisis narrativo de conclusión no está disponible actualmente.</p>
-
-=======
-            <td th:text="${modalidad.averageScore}"></td>
-        </tr>
-    </table>
-
-    <h2>Estado de Programacion y Cronograma</h2>
-    <p class="narrative" th:text="'Estado del Cronograma: ' + ${scheduleStatus} + ' | Total de slots programados: ' + ${totalScheduledSlots}"></p>
-
-    <h2>Conclusion</h2>
-    <p class="narrative" th:text="${conclusion}"></p>
->>>>>>> develop
 </body>
 </html>
 

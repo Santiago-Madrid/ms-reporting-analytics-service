@@ -23,11 +23,7 @@ import com.wd.ms_reporting_analytics_service.dto.external.ModalityResponseDto;
  * directa (via Consul) NO pasa por el Gateway, que es el unico
  * que strippea el context-path para el filtro de seguridad.
  */
-<<<<<<< HEAD
-@FeignClient(name = "ms-event-category", path = "/api/v1/modality")
-=======
 @FeignClient(name = "ms-event-category", contextId = "eventCategoryClient", path = "/api/v1/modality")
->>>>>>> develop
 public interface EventCategoryClient {
 
     @GetMapping("/getModalitiesByEventId/{eventId}")
