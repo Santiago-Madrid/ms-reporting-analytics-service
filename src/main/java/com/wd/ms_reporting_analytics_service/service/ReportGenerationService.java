@@ -76,6 +76,12 @@ public class ReportGenerationService {
         context.setVariable("totalScheduledSlots", summary.getScheduleMetrics() != null ? summary.getScheduleMetrics().getTotalSlots() : 0);
         context.setVariable("scheduleStatus", summary.getScheduleMetrics() != null ? summary.getScheduleMetrics().getScheduleStatus() : "N/A");
 
+        // Avisos: por que un dato puede estar en 0 (sin inscritos, sin calificar, sin cronograma)
+        context.setVariable("participantsNotice", ReportNotices.participantsNotice(summary));
+        context.setVariable("scoringNotice", ReportNotices.scoringNotice(summary));
+        context.setVariable("scheduleNotice", ReportNotices.scheduleNotice(
+                summary.getScheduleMetrics() != null ? summary.getScheduleMetrics().getScheduleStatus() : null));
+
         // Format modality average scores
         if (summary.getModalitiesBreakdown() != null) {
             summary.getModalitiesBreakdown().forEach(m -> {

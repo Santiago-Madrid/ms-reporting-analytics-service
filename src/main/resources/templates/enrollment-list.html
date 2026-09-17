@@ -62,7 +62,10 @@
             </td>
         </tr>
         <tr th:if="${rows == null or rows.isEmpty()}">
-            <td colspan="7" class="empty-text" style="text-align: center;">No hay inscritos que coincidan con este filtro.</td>
+            <td colspan="7" class="empty-text" style="text-align: center;">
+                <span th:if="${counters.total == 0}">Este evento todavía no tiene inscripciones registradas.</span>
+                <span th:unless="${counters.total == 0}">No hay inscritos que coincidan con este filtro.</span>
+            </td>
         </tr>
     </table>
 

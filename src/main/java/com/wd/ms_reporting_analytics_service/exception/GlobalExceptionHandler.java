@@ -22,9 +22,4 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleForbidden(ForbiddenReportAccessException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", ex.getMessage()));
     }
-
-    @ExceptionHandler(ScheduleNotAvailableException.class)
-    public ResponseEntity<Map<String, String>> handleScheduleNotAvailable(ScheduleNotAvailableException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
-    }
 }

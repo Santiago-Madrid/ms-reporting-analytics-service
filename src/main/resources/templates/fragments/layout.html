@@ -203,6 +203,18 @@
     .narrative { text-align: justify; margin-bottom: 20px; color: #475569; }
     .empty-text { color: #a0aec0; font-style: italic; font-size: 12px; }
     .summary-line { margin: 4px 0 18px 0; font-size: 11px; color: #64748b; }
+
+    /* Avisos: por que un dato sale en 0 (sin inscritos, sin calificar, sin cronograma) */
+    .notice-box {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid #94a3b8;
+        border-radius: 6px;
+        padding: 9px 14px;
+        margin-bottom: 12px;
+        font-size: 10px;
+        color: #475569;
+    }
 </style>
 
 <div th:fragment="header(eyebrow, title, subtitle, docId)">
@@ -226,6 +238,10 @@
             </td>
         </tr>
     </table>
+</div>
+
+<div class="notice-box" th:fragment="notice(message)" th:if="${message != null and !#strings.isEmpty(message)}">
+    <strong>Nota:</strong> <span th:text="${message}"></span>
 </div>
 
 <table class="signature-block" th:fragment="signatureBlock">

@@ -40,6 +40,9 @@
         </tr>
     </table>
 
+    <div th:replace="~{fragments/layout :: notice(${participantsNotice})}"></div>
+    <div th:replace="~{fragments/layout :: notice(${scoringNotice})}"></div>
+
     <h2 class="section-title">Análisis por Modalidad</h2>
     <p class="narrative" th:if="${analisisPorModalidad != null and !analisisPorModalidad.isEmpty()}" th:text="${analisisPorModalidad}"></p>
 
@@ -62,7 +65,9 @@
     </table>
 
     <h2 class="section-title">Estado de Programación y Cronograma</h2>
-    <p class="narrative" th:text="'Estado del Cronograma: ' + ${scheduleStatus} + ' | Total de slots programados: ' + ${totalScheduledSlots}"></p>
+    <p class="narrative" th:if="${scheduleNotice == null or #strings.isEmpty(scheduleNotice)}"
+       th:text="'El cronograma está publicado con ' + ${totalScheduledSlots} + ' turnos programados.'"></p>
+    <div th:replace="~{fragments/layout :: notice(${scheduleNotice})}"></div>
 
     <h2 class="section-title">Conclusión</h2>
     <p class="narrative" th:if="${conclusion != null and !conclusion.isEmpty()}" th:text="${conclusion}"></p>
