@@ -9,7 +9,6 @@ import com.wd.ms_reporting_analytics_service.client.McpReportClient;
 import com.wd.ms_reporting_analytics_service.domain.EventSummary;
 import com.wd.ms_reporting_analytics_service.dto.AiReportRequest;
 import com.wd.ms_reporting_analytics_service.dto.AiReportResponse;
-import com.wd.ms_reporting_analytics_service.repository.EventSummaryRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,8 +16,15 @@ import lombok.RequiredArgsConstructor;
  * RF-62: orquesta la generacion completa del reporte (PDF o Excel).
  *
  * Flujo:
- *   1. Trae el EventSummary consolidado (si no existe, lo sincroniza
- *      primero llamando a EventSummaryConsolidationService)
+ *   1. Sincroniza el EventSummary contra los servicios transaccionales
+ *      (ms-scoring, ms-event-category, ms-scheduling) en cada llamada.
+ *      Antes se reusaba el EventSummary ya guardado en Mongo si existia
+ *      y NUNCA se volvia a actualizar, asi que un evento calificado
+ *      despues de la primera consolidacion seguia mostrando promedio/
+ *      maximo/minimo en 0.00 para siempre. Descargar un reporte es una
+ *      accion puntual del usuario (no una vista de alta frecuencia como
+ *      el dashboard), asi que aqui conviene priorizar datos frescos
+ *      sobre ahorrar las llamadas a los otros microservicios.
  *   2. Arma el AiReportRequest con las metricas
  *   3. Llama al MCP de Python -> recibe la narrativa (AiReportResponse)
  *   4. Deja todo listo en un objeto ReportData que usan tanto
@@ -28,17 +34,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReportGenerationService {
 
-    private final EventSummaryRepository eventSummaryRepository;
     private final EventSummaryConsolidationService consolidationService;
     private final McpReportClient mcpReportClient;
 
     public record ReportData(EventSummary summary, AiReportResponse narrative) {}
 
-    public ReportData buildReportData(Long eventId) {
-        String eventIdStr = String.valueOf(eventId);
-
-        EventSummary summary = eventSummaryRepository.findByEventId(eventIdStr)
-                .orElseGet(() -> consolidationService.syncEventSummary(eventId));
+    public ReportData buildReportData(Long eventId, Long requestingUserId) {
+        EventSummary summary = consolidationService.syncEventSummary(eventId, requestingUserId);
 
         AiReportRequest aiRequest = toAiRequest(summary);
         AiReportResponse narrative = new AiReportResponse();
@@ -62,6 +64,8 @@ public class ReportGenerationService {
 
         context.setVariable("eventName", summary.getEventName());
         context.setVariable("executionDate", summary.getExecutionDate());
+        context.setVariable("docId", "WD-GEN-" + summary.getEventId() + "-"
+                + java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd").format(java.time.LocalDate.now()));
         context.setVariable("totalParticipants", summary.getTotals().getApprovedEnrollments());
         context.setVariable("totalModalities", summary.getTotals().getTotalModalities());
         context.setVariable("overallAverageScore", String.format("%.2f", summary.getEvaluationMetrics().getOverallAverage()));

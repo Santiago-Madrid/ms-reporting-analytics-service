@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <th:block th:replace="~{fragments/layout :: styles}"></th:block>
+</head>
+<body>
+    <div th:replace="~{fragments/layout :: header(eyebrow='REPORTE DE INSCRITOS', title=${reportTitle}, subtitle=${eventName} + ' — generado el ' + ${generatedAt}, docId=${docId})}"></div>
+
+    <table class="kpi-grid">
+        <tr>
+            <td class="kpi-card kpi-neutral">
+                <span class="kpi-label">Total</span>
+                <span class="kpi-value" th:text="${counters.total}">0</span>
+                <span class="kpi-hint">inscritos</span>
+            </td>
+            <td class="kpi-card kpi-approved">
+                <span class="kpi-label">Aprobados</span>
+                <span class="kpi-value" th:text="${counters.approved}">0</span>
+            </td>
+            <td class="kpi-card kpi-neutral">
+                <span class="kpi-label">Pendientes</span>
+                <span class="kpi-value" th:text="${counters.pending}">0</span>
+            </td>
+            <td class="kpi-card kpi-rejected">
+                <span class="kpi-label">Rechazados</span>
+                <span class="kpi-value" th:text="${counters.rejected}">0</span>
+            </td>
+            <td class="kpi-card kpi-track">
+                <span class="kpi-label">Con pista</span>
+                <span class="kpi-value" th:text="${counters.withTrack}">0</span>
+                <span class="kpi-hint">cargada</span>
+            </td>
+            <td class="kpi-card kpi-warning">
+                <span class="kpi-label">Sin pista</span>
+                <span class="kpi-value" th:text="${counters.withoutTrack}">0</span>
+                <span class="kpi-hint">faltantes</span>
+            </td>
+        </tr>
+    </table>
+
+    <table class="data-table">
+        <tr>
+            <th style="width:28px;">#</th>
+            <th>Participante</th>
+            <th>Documento</th>
+            <th>Correo</th>
+            <th>Modalidad</th>
+            <th style="text-align:center;">Estado</th>
+            <th style="text-align:center;">Pista Musical</th>
+        </tr>
+        <tr th:each="row, iter : ${rows}">
+            <td th:text="${iter.count}">1</td>
+            <td><span class="avatar" th:text="${row.initials}">--</span><span th:text="${row.fullName}"></span></td>
+            <td th:text="${row.documentNumber}"></td>
+            <td th:text="${row.email}"></td>
+            <td><span class="badge-modality" th:text="${row.modalityName}"></span></td>
+            <td style="text-align:center;"><span class="status-pill" th:classappend="${row.statusCssClass}" th:text="${row.statusLabel}"></span></td>
+            <td style="text-align:center;">
+                <span th:if="${row.trackCssClass != null and !#strings.isEmpty(row.trackCssClass)}" class="track-pill" th:classappend="${row.trackCssClass}" th:text="${row.trackLabel}"></span>
+                <span th:unless="${row.trackCssClass != null and !#strings.isEmpty(row.trackCssClass)}" th:text="${row.trackLabel}"></span>
+            </td>
+        </tr>
+        <tr th:if="${rows == null or rows.isEmpty()}">
+            <td colspan="7" class="empty-text" style="text-align: center;">No hay inscritos que coincidan con este filtro.</td>
+        </tr>
+    </table>
+
+    <div th:replace="~{fragments/layout :: signatureBlock}"></div>
+</body>
+</html>
