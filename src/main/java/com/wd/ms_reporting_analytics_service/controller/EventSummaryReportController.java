@@ -16,6 +16,7 @@ import com.wd.ms_reporting_analytics_service.dto.EventSummaryReportResponse;
 import com.wd.ms_reporting_analytics_service.security.ReportAccessGuard;
 import com.wd.ms_reporting_analytics_service.service.EnrollmentReportService;
 import com.wd.ms_reporting_analytics_service.service.ReportGenerationService;
+import com.wd.ms_reporting_analytics_service.service.ReportNotices;
 
 import lombok.RequiredArgsConstructor;
 
@@ -78,6 +79,11 @@ public class EventSummaryReportController {
                 .totalScheduledSlots(summary.getScheduleMetrics() != null ? summary.getScheduleMetrics().getTotalSlots() : 0)
                 .scheduleStatus(summary.getScheduleMetrics() != null ? summary.getScheduleMetrics().getScheduleStatus() : "N/A")
                 .modalities(modalities)
+                .participantsNotice(counters.getApproved() == 0
+                        ? "Este evento todavía no tiene inscripciones aprobadas registradas." : null)
+                .scoringNotice(ReportNotices.scoringNotice(summary))
+                .scheduleNotice(ReportNotices.scheduleNotice(
+                        summary.getScheduleMetrics() != null ? summary.getScheduleMetrics().getScheduleStatus() : null))
                 .build();
 
         return ResponseEntity.ok(response);

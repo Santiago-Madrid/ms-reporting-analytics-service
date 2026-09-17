@@ -2,15 +2,19 @@ package com.wd.ms_reporting_analytics_service.service;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.wd.ms_reporting_analytics_service.client.EnrollmentClient;
 import com.wd.ms_reporting_analytics_service.client.EventCategoryClient;
 import com.wd.ms_reporting_analytics_service.client.EventClient;
 import com.wd.ms_reporting_analytics_service.client.SchedulingReportClient;
 import com.wd.ms_reporting_analytics_service.client.ScoringClient;
 import com.wd.ms_reporting_analytics_service.domain.EventSummary;
+import com.wd.ms_reporting_analytics_service.dto.external.EnrollmentReportDto;
 import com.wd.ms_reporting_analytics_service.dto.external.EventResponseDto;
 import com.wd.ms_reporting_analytics_service.dto.external.HttpGlobalResponse;
 import com.wd.ms_reporting_analytics_service.dto.external.ModalityResponseDto;
@@ -34,6 +38,7 @@ public class EventSummaryConsolidationService {
     private final EventClient eventClient;
     private final ScoringClient scoringClient;
     private final SchedulingReportClient schedulingReportClient;
+    private final EnrollmentClient enrollmentClient;
     private final EventSummaryRepository eventSummaryRepository;
 
     /** Sincroniza sin un usuario puntual en contexto (ej. InternalSyncController): usa el dueño del evento. */
@@ -75,9 +80,27 @@ public class EventSummaryConsolidationService {
             log.warn("No se pudieron obtener las modalidades del evento {} desde ms-event-category: {}", eventId, e.getMessage());
         }
 
-        // 3. Obtener resultados de juzgamiento desde ms-scoring
+        // 3a. Contar inscritos APROBADOS reales por modalidad, desde ms-enrollment.
+        // Antes "participantes" se contaba a partir de los resultados de jurado
+        // (ms-scoring): un evento con inscritos aprobados pero sin calificar
+        // todavia mostraba 0 participantes, que es enganoso (son datos de
+        // inscripcion, no de juzgamiento). Un fallo aqui no debe tumbar el
+        // resto del resumen: si no se puede consultar, cada modalidad queda en 0.
+        Map<Long, Long> approvedByModality = new HashMap<>();
+        try {
+            List<EnrollmentReportDto> enrollments = enrollmentClient.getEnrollmentsByEvent(eventId);
+            if (enrollments != null) {
+                for (EnrollmentReportDto e : enrollments) {
+                    if (e.getModalityId() == null || !"APPROVED".equalsIgnoreCase(e.getStatus())) continue;
+                    approvedByModality.merge(e.getModalityId(), 1L, Long::sum);
+                }
+            }
+        } catch (Exception e) {
+            log.warn("No se pudieron obtener los inscritos del evento {} desde ms-enrollment: {}", eventId, e.getMessage());
+        }
+
+        // 3b. Obtener resultados de juzgamiento desde ms-scoring (promedio/maximo/minimo)
         List<EventSummary.ModalityBreakdown> breakdowns = new ArrayList<>();
-        int totalParticipants = 0;
         double sumOfAllScores = 0.0;
         int countOfAllScores = 0;
         double highest = 0.0;
@@ -99,7 +122,7 @@ public class EventSummaryConsolidationService {
             breakdown.setModalityId(modality.getId());
             breakdown.setCategory(modality.getCategory());
             breakdown.setDivision(modality.getDivision());
-            breakdown.setParticipantCount(results.size());
+            breakdown.setParticipantCount(approvedByModality.getOrDefault(modality.getId(), 0L).intValue());
 
             double avg = results.stream()
                     .filter(r -> r.getFinalScore() != null)
@@ -110,7 +133,6 @@ public class EventSummaryConsolidationService {
 
             breakdowns.add(breakdown);
 
-            totalParticipants += results.size();
             for (ResultResponse r : results) {
                 if (r.getFinalScore() == null) continue;
                 double score = r.getFinalScore();
@@ -128,13 +150,16 @@ public class EventSummaryConsolidationService {
             }
         }
 
+        long totalApprovedEnrollments = approvedByModality.values().stream().mapToLong(Long::longValue).sum();
+
         summary.setModalitiesBreakdown(breakdowns);
         summary.getTotals().setTotalModalities(modalities.size());
-        summary.getTotals().setApprovedEnrollments(totalParticipants);
+        summary.getTotals().setApprovedEnrollments((int) totalApprovedEnrollments);
 
         summary.getEvaluationMetrics().setOverallAverage(countOfAllScores > 0 ? sumOfAllScores / countOfAllScores : 0.0);
         summary.getEvaluationMetrics().setHighestScore(hasAnyScore ? highest : 0.0);
         summary.getEvaluationMetrics().setLowestScore(hasAnyScore ? lowest : 0.0);
+        summary.getEvaluationMetrics().setHasResults(hasAnyScore);
 
         // 4. Obtener datos del cronograma desde ms-scheduling.
         // ms-scheduling exige el header X-User-Id y, si el cronograma esta en

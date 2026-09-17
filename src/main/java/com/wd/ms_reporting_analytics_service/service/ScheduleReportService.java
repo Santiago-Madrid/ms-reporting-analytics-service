@@ -84,7 +84,8 @@ public class ScheduleReportService {
         context.setVariable("eventName", data.getEventName());
         context.setVariable("docId", data.getDocId());
         context.setVariable("totalSlots", data.getTotalSlots());
-        context.setVariable("generatedAt", data.getGeneratedAt() != null ? DATETIME_DISPLAY.format(data.getGeneratedAt()) : "N/A");
+        context.setVariable("generatedAt", data.getGeneratedAt() != null ? DATETIME_DISPLAY.format(data.getGeneratedAt()) : "no disponible");
+        context.setVariable("scheduleNotice", ReportNotices.scheduleNotice(data.getStatus()));
 
         List<SlotView> views = data.getSlots() == null ? List.of() : data.getSlots().stream()
                 .map(s -> new SlotView(
@@ -111,6 +112,7 @@ public class ScheduleReportService {
                 .eventName(eventName)
                 .available(false)
                 .status(status)
+                .docId(buildDocId(eventId))
                 .totalSlots(0)
                 .slots(List.of())
                 .build();

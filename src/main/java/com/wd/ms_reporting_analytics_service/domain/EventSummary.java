@@ -75,6 +75,11 @@ public class EventSummary {
         private Double highestScore = 0.0;
         private Double lowestScore = 0.0;
         private Double overallAverage = 0.0;
+
+        /** true si existe al menos un resultado con finalScore calculado.
+         *  Distingue "0.00 porque nadie ha sido calificado" de "0.00 porque
+         *  el puntaje real fue cero", que de otra forma se ven identicos. */
+        private Boolean hasResults = false;
     }
 
     @Data

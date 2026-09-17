@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.thymeleaf.context.Context;
 
 import com.wd.ms_reporting_analytics_service.dto.ScheduleReportResponse;
-import com.wd.ms_reporting_analytics_service.exception.ScheduleNotAvailableException;
 import com.wd.ms_reporting_analytics_service.security.ReportAccessGuard;
 import com.wd.ms_reporting_analytics_service.service.PdfGeneratorService;
 import com.wd.ms_reporting_analytics_service.service.ScheduleReportService;
@@ -48,13 +47,9 @@ public class ScheduleReportController {
         reportAccessGuard.assertOwnerOrEventAdmin(eventId, authenticatedUserId);
         ScheduleReportResponse data = scheduleReportService.getScheduleReport(eventId, authenticatedUserId);
 
-        if (!data.isAvailable()) {
-            String message = "DRAFT_NOT_VISIBLE".equals(data.getStatus())
-                    ? "El cronograma del evento " + eventId + " aun esta en borrador y no es visible para este usuario."
-                    : "El evento " + eventId + " todavia no tiene un cronograma generado.";
-            throw new ScheduleNotAvailableException(message);
-        }
-
+        // Aunque no haya cronograma generado (o este en borrador), se genera igual
+        // el PDF con un aviso explicando por que, en vez de responder un error crudo:
+        // quien pide el reporte tambien quiere un documento descargable como constancia.
         Context context = scheduleReportService.toTemplateContext(data);
         byte[] pdfBytes = pdfGeneratorService.generatePdf("schedule", context);
 

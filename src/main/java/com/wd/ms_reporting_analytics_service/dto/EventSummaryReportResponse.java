@@ -37,6 +37,11 @@ public class EventSummaryReportResponse {
     private String scheduleStatus;
     private List<ModalityBreakdownDto> modalities;
 
+    /** Explican por que un dato puede estar en 0; null cuando no aplica ningun aviso. */
+    private String participantsNotice;
+    private String scoringNotice;
+    private String scheduleNotice;
+
     @Data
     @Builder
     @NoArgsConstructor
