@@ -12,15 +12,15 @@ import com.wd.ms_reporting_analytics_service.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 
 /**
- * RF-55: Panel administrativo. Acceso: Administrador.
+ * RF-55: Panel de resumen. Acceso: cualquier usuario autenticado, pero
+ * acotado a sus propios eventos.
  *
- * TODO (pendiente de confirmar con Santiago): el sistema no tiene un
- * rol fijo "Administrador" en el JWT (los roles son contextuales:
- * organizador = dueno del evento, participante = inscrito aceptado).
- * Falta definir si existe un rol Administrador global (ej. un flag
- * isAdmin en ms-auth-identityservice) para poder restringir este
- * endpoint correctamente. Mientras tanto, SOLO exige autenticacion
- * (X-User-Id presente), sin validar rol.
+ * Resuelto: no existe (ni se va a crear) un rol "Administrador" global de
+ * plataforma; el rol ADMIN de este sistema es por evento (user_event_roles
+ * en ms-enrollment). Como este endpoint agrega datos de varios eventos a
+ * la vez, no hay un evento puntual contra el cual comprobar ese rol, asi
+ * que en vez de eso se filtra el agregado por ownerId == X-User-Id: cada
+ * usuario ve el resumen de los eventos que el mismo organiza.
  */
 @RestController
 @RequestMapping("/reports/dashboard")
@@ -31,9 +31,8 @@ public class DashboardController {
 
     @GetMapping("/summary")
     public ResponseEntity<DashboardSummaryResponse> getSummary(
-            @RequestHeader("X-User-Id") String userId) {
+            @RequestHeader("X-User-Id") Long userId) {
 
-        // TODO: validar rol Administrador una vez este definido (ver nota arriba)
-        return ResponseEntity.ok(dashboardService.getSummary());
+        return ResponseEntity.ok(dashboardService.getSummary(userId));
     }
 }

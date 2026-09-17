@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.wd.ms_reporting_analytics_service.client.EventCategoryClient;
 import com.wd.ms_reporting_analytics_service.client.EventClient;
-import com.wd.ms_reporting_analytics_service.client.SchedulingClient;
+import com.wd.ms_reporting_analytics_service.client.SchedulingReportClient;
 import com.wd.ms_reporting_analytics_service.client.ScoringClient;
 import com.wd.ms_reporting_analytics_service.domain.EventSummary;
 import com.wd.ms_reporting_analytics_service.dto.external.EventResponseDto;
@@ -18,6 +18,7 @@ import com.wd.ms_reporting_analytics_service.dto.external.ResultResponse;
 import com.wd.ms_reporting_analytics_service.dto.external.ScheduleResponseDto;
 import com.wd.ms_reporting_analytics_service.repository.EventSummaryRepository;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,10 +33,15 @@ public class EventSummaryConsolidationService {
     private final EventCategoryClient eventCategoryClient;
     private final EventClient eventClient;
     private final ScoringClient scoringClient;
-    private final SchedulingClient schedulingClient;
+    private final SchedulingReportClient schedulingReportClient;
     private final EventSummaryRepository eventSummaryRepository;
 
+    /** Sincroniza sin un usuario puntual en contexto (ej. InternalSyncController): usa el dueño del evento. */
     public EventSummary syncEventSummary(Long eventId) {
+        return syncEventSummary(eventId, null);
+    }
+
+    public EventSummary syncEventSummary(Long eventId, Long requestingUserId) {
         String eventIdStr = String.valueOf(eventId);
 
         EventSummary summary = eventSummaryRepository.findByEventId(eventIdStr)
@@ -130,14 +136,31 @@ public class EventSummaryConsolidationService {
         summary.getEvaluationMetrics().setHighestScore(hasAnyScore ? highest : 0.0);
         summary.getEvaluationMetrics().setLowestScore(hasAnyScore ? lowest : 0.0);
 
-        // 4. Obtener datos del cronograma desde ms-scheduling
+        // 4. Obtener datos del cronograma desde ms-scheduling.
+        // ms-scheduling exige el header X-User-Id y, si el cronograma esta en
+        // borrador, solo lo muestra al dueno del evento o a STAFF/JURY. Si no
+        // hay un usuario puntual pidiendo el reporte (ej. sync interno), se usa
+        // el dueno del evento (ya resuelto arriba) como solicitante razonable.
+        Long scheduleRequesterId = requestingUserId != null ? requestingUserId : summary.getOwnerId();
         try {
-            ScheduleResponseDto scheduleDto = schedulingClient.getScheduleByEvent(eventId);
+            if (scheduleRequesterId == null) {
+                throw new IllegalStateException("No hay un usuario ni un dueno de evento para consultar el cronograma.");
+            }
+            HttpGlobalResponse<ScheduleResponseDto> scheduleResp = schedulingReportClient.getScheduleByEvent(eventId, scheduleRequesterId);
+            ScheduleResponseDto scheduleDto = scheduleResp != null ? scheduleResp.getData() : null;
             if (scheduleDto != null) {
-                summary.getScheduleMetrics().setTotalSlots(scheduleDto.getTotalSlots() != null ? scheduleDto.getTotalSlots() : 0);
+                List<?> slots = scheduleDto.getSchedules();
+                int totalSlots = scheduleDto.getTotalSlots() != null ? scheduleDto.getTotalSlots() : (slots != null ? slots.size() : 0);
+                summary.getScheduleMetrics().setTotalSlots(totalSlots);
                 summary.getScheduleMetrics().setScheduleStatus("CONFIGURED");
                 summary.getScheduleMetrics().setGeneratedAt(scheduleDto.getGeneratedAt() != null ? scheduleDto.getGeneratedAt().toString() : Instant.now().toString());
+            } else {
+                summary.getScheduleMetrics().setScheduleStatus("NOT_CONFIGURED");
             }
+        } catch (FeignException.NotFound e) {
+            summary.getScheduleMetrics().setScheduleStatus("NOT_CONFIGURED");
+        } catch (FeignException.BadRequest e) {
+            summary.getScheduleMetrics().setScheduleStatus("DRAFT_NOT_VISIBLE");
         } catch (Exception e) {
             log.warn("No se pudo obtener el cronograma del evento {} desde ms-scheduling: {}", eventId, e.getMessage());
             summary.getScheduleMetrics().setScheduleStatus("PENDING_OR_UNAVAILABLE");

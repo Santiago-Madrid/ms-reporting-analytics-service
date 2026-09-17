@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <th:block th:replace="~{fragments/layout :: styles}"></th:block>
+</head>
+<body>
+    <div th:replace="~{fragments/layout :: header(eyebrow='CRONOGRAMA DEL EVENTO', title=${eventName}, subtitle='Generado el ' + ${generatedAt}, docId=${docId})}"></div>
+
+    <table class="kpi-grid">
+        <tr>
+            <td class="kpi-card kpi-track">
+                <span class="kpi-label">Total de turnos</span>
+                <span class="kpi-value" th:text="${totalSlots}">0</span>
+            </td>
+        </tr>
+    </table>
+
+    <table class="data-table">
+        <tr>
+            <th style="width:28px;">#</th>
+            <th>Participante / Grupo</th>
+            <th>Modalidad</th>
+            <th>Estilo</th>
+            <th>Tarima</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th style="text-align:center;">Estado</th>
+        </tr>
+        <tr th:each="slot : ${slots}">
+            <td th:text="${slot.order}"></td>
+            <td th:text="${slot.participantOrGroup}"></td>
+            <td><span class="badge-modality" th:text="${slot.modality}"></span></td>
+            <td th:text="${slot.style}"></td>
+            <td th:text="${slot.stage}"></td>
+            <td th:text="${slot.startTime}"></td>
+            <td th:text="${slot.endTime}"></td>
+            <td style="text-align:center;"><span class="status-pill status-pending" th:text="${slot.status}"></span></td>
+        </tr>
+        <tr th:if="${slots == null or slots.isEmpty()}">
+            <td colspan="8" class="empty-text" style="text-align: center;">No hay turnos programados.</td>
+        </tr>
+    </table>
+
+    <div th:replace="~{fragments/layout :: signatureBlock}"></div>
+</body>
+</html>

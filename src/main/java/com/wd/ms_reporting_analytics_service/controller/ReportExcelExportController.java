@@ -4,9 +4,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wd.ms_reporting_analytics_service.security.ReportAccessGuard;
 import com.wd.ms_reporting_analytics_service.service.ExcelGeneratorService;
 import com.wd.ms_reporting_analytics_service.service.ReportGenerationService;
 
@@ -20,10 +22,12 @@ public class ReportExcelExportController {
 
     private final ReportGenerationService reportGenerationService;
     private final ExcelGeneratorService excelGeneratorService;
+    private final ReportAccessGuard reportAccessGuard;
 
     @GetMapping(produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    public ResponseEntity<byte[]> exportExcel(@PathVariable Long eventId) {
-        ReportGenerationService.ReportData data = reportGenerationService.buildReportData(eventId);
+    public ResponseEntity<byte[]> exportExcel(@PathVariable Long eventId, @RequestHeader("X-User-Id") Long authenticatedUserId) {
+        reportAccessGuard.assertOwnerOrEventAdmin(eventId, authenticatedUserId);
+        ReportGenerationService.ReportData data = reportGenerationService.buildReportData(eventId, authenticatedUserId);
         byte[] excelBytes = excelGeneratorService.generateExcel(data.summary(), data.narrative());
 
         return ResponseEntity.ok()
